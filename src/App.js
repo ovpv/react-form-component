@@ -18,7 +18,7 @@ function App() {
       }}>
         <input type="email" value={email} onChange={(e)=> updateEmail(e.target.value)}/>
         <input type="number" value={mobile} onChange={(e)=> updateMobile(e.target.value)}/>
-        {email.indexOf('gmail')>0 && <input type="number" name="age" onChange={(e)=> updateAge(e.target.value)}/>}
+        {email.indexOf('gmail')>0 && <input type="number" value={age} onChange={(e)=> updateAge(e.target.value)}/>}
         <button type="submit">Submit</button>
       </Form>
     </div>
