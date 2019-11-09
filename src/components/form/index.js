@@ -8,6 +8,15 @@ const Form = ({onSubmit, children })=>{
         e.preventDefault();
         onSubmit();
     },[onSubmit])
+    const isValid = (valid, children) => {
+        const filteredChildren = children.filter(
+          child => child !== false && child.props.type !== "submit"
+        );
+        return (
+          Object.values(valid).length === filteredChildren.length &&
+          Object.values(valid).every(val => val === true)
+        );
+      };
     const validate = useCallback((ev,props)=>{
         if(props.onChange) props.onChange(ev);
         switch(props.type){
@@ -53,7 +62,7 @@ const Form = ({onSubmit, children })=>{
                 case "input":
                     return React.cloneElement( el, { onChange: (e)=> validate(e,el.props), key:`${el.type}-${index}`} );
                 case "button":
-                    return React.cloneElement( el,{ onClick : (e)=> formOnSubmit(e,el.props), key:`${el.type}-${index}`, disabled: (!((Object.values(valid).length === children.length) || Object.values(valid).every(val => val === true))) } );
+                    return React.cloneElement( el,{ onClick : (e)=> formOnSubmit(e,el.props), key:`${el.type}-${index}`, disabled: !isValid(valid,children) } );
                 default:
                     return el
             }
@@ -65,7 +74,7 @@ const Form = ({onSubmit, children })=>{
     return (
         <form>
             {updatedChildren}
-            <p>{`form data is ${(Object.values(valid).length === children.length || Object.values(valid).every(val => val === true)) ? 'valid' : 'invalid'}`}</p>
+            <p>{`form data is ${isValid(valid,children) ? 'valid' : 'invalid'}`}</p>
         </form>
     )
 }
