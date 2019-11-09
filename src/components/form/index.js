@@ -8,42 +8,73 @@ const Form = ({onSubmit, children })=>{
         e.preventDefault();
         onSubmit();
     },[onSubmit])
+    const isValid = (valid, children) => {
+        const filteredChildren = children.filter(
+          child => child !== false && child.props.type !== "submit"
+        );
+        return (
+          Object.values(valid).length === filteredChildren.length &&
+          Object.values(valid).every(val => val === true)
+        );
+      };
     const validate = useCallback((ev,props)=>{
         if(props.onChange) props.onChange(ev);
         switch(props.type){
             case "email": 
-            if(!props.value.length) updateValidity(false)
+            if(!props.value.length) updateValidity({
+                ...valid,
+                [props.name] : false
+            })
             const EmailPattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-                (EmailPattern.test(props.value)) ? updateValidity(true) : updateValidity(false)
+                (EmailPattern.test(props.value)) ? updateValidity({
+                    ...valid,
+                    [props.name] : true
+                }) : updateValidity({
+                    ...valid,
+                    [props.name] : false
+                })
                 break;
             case "number":
-                    if(!props.value.length) updateValidity(false)
-                const NumberPattern = /^\(?([0-9]{10})$/;
-                 (NumberPattern.test(props.value)) ? updateValidity(true) :  updateValidity(false)
+                    if(!props.value.length) {updateValidity({
+                        ...valid,
+                        [props.name] : false
+                    })}else{
+                        const NumberPattern = (props.name === "mobile")? /^\(?([0-9]{10})$/  : /^\(?([0-9])$/ ;
+                        (NumberPattern.test(props.value)) ? updateValidity({
+                           ...valid,
+                           [props.name] : true
+                       }) :  updateValidity({
+                           ...valid,
+                           [props.name] : false
+                       })
+                    }
                 break;
             default:
-                    updateValidity(false)
+                updateValidity({
+                    ...valid,
+                    [props.name] : false
+                })
         }
-    },[])
+    },[valid])
     const detectElement = useCallback((elements)=>{
         return elements.map((el,index)=>{
             switch(el.type){
                 case "input":
                     return React.cloneElement( el, { onChange: (e)=> validate(e,el.props), key:`${el.type}-${index}`} );
                 case "button":
-                    return React.cloneElement( el,{ onClick : (e)=> formOnSubmit(e,el.props), key:`${el.type}-${index}`, disabled: (!valid) } );
+                    return React.cloneElement( el,{ onClick : (e)=> formOnSubmit(e,el.props), key:`${el.type}-${index}`, disabled: !isValid(valid,children) } );
                 default:
                     return el
             }
         })
-    },[formOnSubmit, valid, validate])
+    },[children, formOnSubmit, valid, validate])
     useEffect(()=>{
-        updateChildren(detectElement(children))
+        updateChildren(detectElement(children));
     }, [children, detectElement])
     return (
         <form>
             {updatedChildren}
-            <p>{`form data is ${valid ? 'valid' : 'invalid'}`}</p>
+            <p>{`form data is ${isValid(valid,children) ? 'valid' : 'invalid'}`}</p>
         </form>
     )
 }
