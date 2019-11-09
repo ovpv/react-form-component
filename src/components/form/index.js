@@ -26,18 +26,19 @@ const Form = ({onSubmit, children })=>{
                 })
                 break;
             case "number":
-                    if(!props.value.length) updateValidity({
+                    if(!props.value.length) {updateValidity({
                         ...valid,
                         [props.name] : false
-                    })
-                const NumberPattern = (props.name ==="mobile")? /^\(?([0-9]{10})$/  : /^\(?([0-9])$/ ;
-                 (NumberPattern.test(props.value)) ? updateValidity({
-                    ...valid,
-                    [props.name] : true
-                }) :  updateValidity({
-                    ...valid,
-                    [props.name] : false
-                })
+                    })}else{
+                        const NumberPattern = (props.name === "mobile")? /^\(?([0-9]{10})$/  : /^\(?([0-9])$/ ;
+                        (NumberPattern.test(props.value)) ? updateValidity({
+                           ...valid,
+                           [props.name] : true
+                       }) :  updateValidity({
+                           ...valid,
+                           [props.name] : false
+                       })
+                    }
                 break;
             default:
                 updateValidity({
@@ -52,26 +53,20 @@ const Form = ({onSubmit, children })=>{
                 case "input":
                     return React.cloneElement( el, { onChange: (e)=> validate(e,el.props), key:`${el.type}-${index}`} );
                 case "button":
-                    console.log(((Object.values(valid).length === children.filter((child)=> child.type === "input").length) && Object.values(valid).every(val => val === true)));
-                    console.log({
-                        validlen: Object.values(valid).length,
-                        childlen: children.filter((child)=> child.type === "input").length,
-                        validtrue: Object.values(valid).every(val => val === true),
-                        valid
-                    })
-                    return React.cloneElement( el,{ onClick : (e)=> formOnSubmit(e,el.props), key:`${el.type}-${index}`, disabled: (!((Object.values(valid).length === children.length) && Object.values(valid).every(val => val === true))) } );
+                    return React.cloneElement( el,{ onClick : (e)=> formOnSubmit(e,el.props), key:`${el.type}-${index}`, disabled: (!((Object.values(valid).length === children.length) || Object.values(valid).every(val => val === true))) } );
                 default:
                     return el
             }
         })
     },[children, formOnSubmit, valid, validate])
     useEffect(()=>{
-        updateChildren(detectElement(children))
-    }, [children, detectElement])
+        updateChildren(detectElement(children));
+        console.log(valid)
+    }, [children, detectElement, valid])
     return (
         <form>
             {updatedChildren}
-            <p>{`form data is ${(Object.values(valid).length === children.length && Object.values(valid).every(val => val === true)) ? 'valid' : 'invalid'}`}</p>
+            <p>{`form data is ${(Object.values(valid).length === children.length || Object.values(valid).every(val => val === true)) ? 'valid' : 'invalid'}`}</p>
         </form>
     )
 }
