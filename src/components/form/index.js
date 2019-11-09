@@ -61,8 +61,7 @@ const Form = ({onSubmit, children })=>{
     },[children, formOnSubmit, valid, validate])
     useEffect(()=>{
         updateChildren(detectElement(children));
-        console.log(valid)
-    }, [children, detectElement, valid])
+    }, [children, detectElement])
     return (
         <form>
             {updatedChildren}
