@@ -63,7 +63,7 @@ export default App;
 
 ## Demo <a name="demo"></a>
 
-<iframe src="https://csb-2q0ok-9xp7imzj5.now.sh/" height="500" width="500"></iframe>
+https://csb-2q0ok-9xp7imzj5.now.sh/
 
 ## Known issues <a name="issues"></a>
 
